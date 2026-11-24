@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#B71C1C">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Yuk Absen</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    :root {
+      --red-primary: #c8323c;
+      --red-dark: #7b0e16;
+      --bg-main: #f5f6f8;
+      --bg-surface: #fff;
+      --border-subtle: #e4e6eb;
+      --border-strong: #d7dae0;
+      --text-main: #14161a;
+      --text-secondary: #5f6470;
+      --text-muted: #8a8e99;
+      --icon-muted: #a7abb5;
+      --grad-header: linear-gradient(165deg, var(--red-primary) 0%, var(--red-dark) 100%);
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: var(--font);
+      background: var(--bg-main);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 70px;
+    }
+    .shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .hdr {
+      background: var(--grad-header);
+      flex-shrink: 0;
+      padding: 8px 10px 8px;
+    }
+    .htop {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .greet {
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 12px;
+    }
+    .uname {
+      color: #fff;
+      font-weight: 600;
+      font-size: 16px;
+      margin-top: 2px;
+    }
+    .dloc {
+      color: rgba(255, 255, 255, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+      font-size: 11px;
+    }
+    .logout-btn {
+      color: #fff;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: inherit;
+    }
+    .card {
+      background: var(--bg-surface);
+      border: 0.5px solid var(--border-subtle);
+      border-radius: 10px;
+      flex-shrink: 0;
+      padding: 8px;
+    }
+    .status-card {
+      border-radius: 10px;
+      margin-bottom: 12px;
+    }
+    .stitle {
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      font-size: 8px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .trow {
+      display: flex;
+      gap: 12px;
+    }
+    .tb {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      align-items: center;
+      text-align: center;
+    }
+    .tb .lbl {
+      color: var(--icon-muted);
+      font-size: 10px;
+    }
+    .tb .val {
+      color: var(--text-main);
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+    .tb .sub {
+      color: var(--icon-muted);
+      font-size: 10px;
+    }
+    .dvv {
+      background: var(--border-subtle);
+      width: 0.5px;
+    }
+    .lc-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 4px 0;
+      position: relative;
+    }
+    .lc-jam {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .lc-angka {
+      color: #fff;
+      white-space: nowrap;
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1.1;
+    }
+    .lc-digit {
+      text-align: center;
+      width: 0.63em;
+      display: inline-block;
+    }
+    .lc-titik {
+      display: inline-block;
+    }
+    .lc-zona {
+      background: var(--red-primary);
+      color: #fff;
+      letter-spacing: 0.5px;
+      border-radius: 6px;
+      padding: 4px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      position: absolute;
+      margin-left: 10px;
+    }
+    .body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px;
+      overflow-y: auto;
+    }
+    .form-group { 
+      margin-bottom: 0;
+    }
+    label { 
+      display: block; 
+      margin-bottom: 8px; 
+      font-weight: 600; 
+      color: var(--text-secondary); 
+      font-size: 11px;
+    }
+    #map { 
+      height: 200px; 
+      border-radius: 8px; 
+      margin-bottom: 8px;
+      border: 0.5px solid var(--border-subtle);
+      transition: border 0.2s ease;
+    }
+    #map.selected {
+      border: 2px solid var(--red-primary);
+      box-shadow: 0 0 0 2px rgba(200, 50, 60, 0.1);
+    }
+    .coord-display { 
+      background: var(--bg-main); 
+      padding: 8px 10px; 
+      border-radius: 6px; 
+      font-size: 10px;
+      color: var(--text-secondary);
+    }
+    .location-btns {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .location-btn {
+      flex: 1;
+      min-width: 80px;
+      padding: 6px 8px;
+      font-size: 10px;
+      background: var(--red-primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      opacity: 0.5;
+    }
+    .location-btn.selected {
+      opacity: 1;
+      box-shadow: 0 2px 8px rgba(200, 50, 60, 0.3);
+      transform: scale(1.02);
+    }
+    .location-btn:not(.selected) {
+      background: #a7abb5;
+    }
+    .image-preview { 
+      max-width: 100%; 
+      max-height: 150px; 
+      margin-top: 8px; 
+      border-radius: 8px; 
+      display: block;
+      border: 0.5px solid var(--border-subtle);
+    }
+    .btnr { 
+      background: var(--red-primary);
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      border-radius: 9px;
+      width: 100%;
+      padding: 15px;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+    .btnr:disabled { 
+      background: var(--border-strong);
+      color: var(--icon-muted);
+      cursor: not-allowed;
+    }
+    .alert-err {
+      background: #fbeaea;
+      border: 0.5px solid #f0c2c2;
+      border-radius: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+    .alert-err-text {
+      color: #8a1f26;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    .success-msg {
+      background: #e5f3ea;
+      border: 0.5px solid #b8dec8;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      color: #1f6b3c;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .riwayat-section {
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      background: var(--bg-surface);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th {
+      background: var(--bg-main);
+      padding: 8px;
+      border: 0.5px solid var(--border-subtle);
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    td {
+      padding: 8px;
+      border: 0.5px solid var(--border-subtle);
+      color: var(--text-main);
+    }
+    .credit {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 0.5px solid var(--border-subtle);
+      text-align: center;
+      font-size: 9px;
+      color: var(--icon-muted);
+    }
+    .credit a { 
+      color: var(--red-primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 0.5px solid var(--border-subtle);
+      border-radius: 8px;
+      font-size: 12px;
+      font-family: inherit;
+      background: var(--bg-surface);
+      color: var(--text-main);
+    }
+    .note {
+      color: var(--icon-muted);
+      text-align: center;
+      font-size: 9px;
+      margin-top: 8px;
+    }
+    
+    /* Dialog popup for API response */
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .dialog-overlay.show {
+      display: flex;
+    }
+    .dialog-box {
+      background: var(--bg-surface);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 360px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    .dialog-header {
+      padding: 16px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .dialog-header.success {
+      background: #e5f3ea;
+      color: #1f6b3c;
+    }
+    .dialog-header.error {
+      background: #fbeaea;
+      color: #8a1f26;
+    }
+    .dialog-content {
+      padding: 16px;
+      color: var(--text-main);
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+    }
+    .dialog-footer {
+      padding: 12px 16px;
+      text-align: center;
+    }
+    .dialog-btn {
+      background: var(--red-primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 24px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .dialog-btn:hover {
+      opacity: 0.9;
+    }
+    
+    /* Warning confirm dialog */
+    .dialog-header.warning {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .dialog-actions {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+    }
+    .dialog-actions button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .dialog-btn-yes {
+      background: var(--red-primary);
+      color: #fff;
+    }
+    .dialog-btn-no {
+      background: var(--bg-main);
+      color: var(--text-main);
+      border: 1px solid var(--border-strong);
+    }
+    .dialog-btn-yes:hover,
+    .dialog-btn-no:hover {
+      opacity: 0.9;
+    }
+    
+    /* Loading spinner */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .loading-overlay.show {
+      display: flex;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .loading-text {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 2px 0 calc(2px + env(safe-area-inset-bottom));
+      z-index: 1000;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 6px;
+      text-decoration: none;
+      color: var(--icon-muted);
+      transition: color 0.2s;
+    }
+    .nav-item.active {
+      color: var(--red-primary);
+    }
+    .nav-item svg {
+      width: 24px;
+      height: 24px;
+    }
+    .nav-label {
+      font-size: 10px;
+      font-weight: 600;
+    }
+  .pin-marker{background:transparent;border:0}.pin-marker svg{display:block;filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+</style>
+</head>
+<body>
+  <div class="shell">
+    <div class="hdr">
+      <div class="htop">
+        <div>
+          <div class="greet" id="greeting">Selamat Pagi,</div>
+          <div class="uname" id="userName">Loading...</div>
+          <div class="dloc">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"></path>
+              <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0"></path>
+            </svg>
+            <span id="locationDate">Loading...</span>
+          </div>
+        </div>
+        <button class="logout-btn" id="logoutBtn">Keluar</button>
+      </div>
+      
+      <div class="card status-card">
+        <div class="stitle">Status Kehadiran Hari Ini</div>
+        <div class="trow">
+          <div class="tb">
+            <div class="lbl">Masuk</div>
+            <div class="val" id="jamMasuk">--:--</div>
+            <div class="sub" id="subMasuk">Belum absen</div>
+          </div>
+          <div class="dvv"></div>
+          <div class="tb">
+            <div class="lbl">Keluar</div>
+            <div class="val" id="jamKeluar">--:--</div>
+            <div class="sub" id="subKeluar">Belum absen</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="lc-box">
+        <div class="lc-jam">
+          <span class="lc-angka" id="liveClock" aria-label="00:00:00">
+            <span class="lc-digit">0</span><span class="lc-digit">0</span><span class="lc-titik">:</span><span class="lc-digit">0</span><span class="lc-digit">0</span><span class="lc-titik">:</span><span class="lc-digit">0</span><span class="lc-digit">0</span>
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="body">
+      <div class="form-group">
+        <label>LOKASI</label>
+        <div class="location-btns">
+          <button type="button" class="location-btn">Patimban</button>
+          <button type="button" class="location-btn">Subang</button>
+          <button type="button" class="location-btn">Cikopo</button>
+          <button type="button" class="location-btn">IKK</button>
+          <button type="button" class="location-btn">Patimban 2</button>
+          <button type="button" class="location-btn">Kertajati</button>
+          <button type="button" class="location-btn">Bandung Barat</button>
+          <button type="button" class="location-btn">Bandung Timur</button>
+          <button type="button" class="location-btn">Karawang Timur</button>
+          <button type="button" class="location-btn">Delta Mas</button>
+
+
+        </div>
+        <div id="map"></div>
+        <div class="coord-display">
+          Lat: <span id="lat">-6.283811</span> | Lon: <span id="lon">107.866208</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 4px;">
+          <input type="checkbox" id="useDumpPhoto" style="width: auto; margin-right: 6px;">
+          <span style="font-size: 11px;">Gunakan Dump Photo</span>
+        </label>
+      </div>
+
+      <div class="form-group" id="fileInputGroup">
+        <label>FOTO SELFIE</label>
+        <input type="file" id="foto" accept="image/*">
+        <img id="preview" class="image-preview" style="display:none;">
+      </div>
+
+      <div class="form-group">
+        <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 4px;">
+          <input type="checkbox" id="forceMode" style="width: auto; margin-right: 6px;">
+          <span style="font-size: 11px;">Force Hit (abaikan status hari ini)</span>
+        </label>
+      </div>
+
+      <button class="btnr" id="absenBtn">Check In</button>
+      <div id="message"></div>
+      
+
+      
+      <!-- <div class="credit">
+        Made by <a href="https://t.me/sffrmnsyh" target="_blank">@sffrmnsyh</a>
+      </div> -->
+    </div>
+  </div>
+
+  <!-- Dialog popup for API response -->
+  <div class="dialog-overlay" id="dialogOverlay">
+    <div class="dialog-box">
+      <div class="dialog-header" id="dialogHeader">Status API</div>
+      <div class="dialog-content" id="dialogContent">-</div>
+      <div class="dialog-footer" id="dialogFooter">
+        <button class="dialog-btn" id="dialogCloseBtn">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm dialog for early checkout -->
+  <div class="dialog-overlay" id="confirmOverlay">
+    <div class="dialog-box">
+      <div class="dialog-header warning">⚠️ Peringatan !!!</div>
+      <div class="dialog-content" id="confirmContent">-</div>
+      <div class="dialog-actions">
+        <button class="dialog-btn-no" id="confirmNoBtn">Tidak</button>
+        <button class="dialog-btn-yes" id="confirmYesBtn">Ya</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Memuat...</div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <script>
+    // ponytail: synchronous auth gate - runs IMMEDIATELY during HTML parse
+    // Module scripts execute async AFTER imports, this blocks render if no auth
+    (function() {
+      const hasToken = localStorage.getItem('auth_access_token') || localStorage.getItem('auth_refresh_token');
+      const hasProfile = localStorage.getItem('auth_profile');
+      
+      if (!hasToken || !hasProfile) {
+        location.replace("/"); // Use replace() to prevent back button
+      }
+    })();
+  </script>
+  
+  <script type="module">
+    import { startSession, authFetch, logout, onSessionEnd, getProfile, getValidAccessToken } from "/auth.js";
+
+    // ponytail: IIFE to ensure synchronous check executes even if async fails
+    (async () => {
+      // ponytail: strict check - require both token AND profile to proceed
+      // Profile is only set after successful login, so this catches:
+      // 1. Never logged in (no token, no profile)
+      // 2. Logged out (tokens cleared, profile cleared)
+      // 3. Expired session (tokens exist but profile cleared after failed refresh)
+      const hasToken = localStorage.getItem('auth_access_token') || localStorage.getItem('auth_refresh_token');
+      const hasProfile = localStorage.getItem('auth_profile');
+      
+      if (!hasToken || !hasProfile) {
+        location.href = "/";
+        return; // Stop execution
+      }
+
+      onSessionEnd(() => { location.href = "/"; });
+      if (!(await startSession())) {
+        location.href = "/";
+        return;
+      }
+
+      const profile = getProfile();
+      document.getElementById('userName').textContent = profile?.nama_karyawan || 'User';
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      console.log('Logout clicked');
+      try {
+        await logout();
+        console.log('Logout completed');
+      } catch (e) {
+        console.error('Logout error:', e);
+      }
+      console.log('Redirecting to /');
+      window.location.href = '/';
+    });
+    
+    // Set dynamic greeting based on hour
+    const now = new Date();
+    const hour = now.getHours();
+    let greeting = 'Selamat Pagi,';
+    if (hour >= 9 && hour < 15) greeting = 'Selamat Siang,';
+    else if (hour >= 15 && hour < 18) greeting = 'Selamat Sore,';
+    else if (hour >= 18) greeting = 'Selamat Malam,';
+    document.getElementById('greeting').textContent = greeting;
+    
+    // Format date: Jumat, 23 Oktober 2026
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const dayName = days[now.getDay()];
+    const date = now.getDate();
+    const monthName = months[now.getMonth()];
+    const year = now.getFullYear();
+    const location = profile?.penugasan || 'Kantor Pusat';
+    document.getElementById('locationDate').textContent = location + '  ·  ' + dayName + ', ' + date + ' ' + monthName + ' ' + year;
+    
+    // Update live clock every second
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      const time = h + ':' + m + ':' + s;
+      
+      const clockEl = document.getElementById('liveClock');
+      clockEl.setAttribute('aria-label', time);
+      clockEl.innerHTML = '<span class="lc-digit">' + h[0] + '</span><span class="lc-digit">' + h[1] + '</span><span class="lc-titik">:</span><span class="lc-digit">' + m[0] + '</span><span class="lc-digit">' + m[1] + '</span><span class="lc-titik">:</span><span class="lc-digit">' + s[0] + '</span><span class="lc-digit">' + s[1] + '</span>';
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    let lat = -6.283811, lon = 107.866208;
+    let selectedFile = null;
+    let todayStatus = { jam_datang: null, jam_pulang: null };
+    let locationSelected = false; // Track if location was explicitly selected
+
+    function setLocation(newLat, newLon, source = 'button') {
+      lat = newLat;
+      lon = newLon;
+      locationSelected = true;
+      document.getElementById('lat').textContent = lat.toFixed(6);
+      document.getElementById('lon').textContent = lon.toFixed(6);
+      marker.setLatLng([lat, lon]);
+      map.panTo([lat, lon]);
+      
+      // Update UI based on source
+      const mapEl = document.getElementById('map');
+      const allBtns = document.querySelectorAll('.location-btn');
+      
+      if (source === 'map') {
+        // Map click: highlight map, remove button selection
+        mapEl.classList.add('selected');
+        allBtns.forEach(b => b.classList.remove('selected'));
+      } else if (source === 'button') {
+        // Button click: highlight button, remove map selection
+        mapEl.classList.remove('selected');
+      }
+    }
+
+    // Location buttons
+    document.querySelectorAll('.location-btn').forEach((btn, idx) => {
+      const coords = [
+        [-6.284012, 107.865902],
+        [-6.500966, 107.676684],
+        [-6.449866, 107.483265],
+        [-6.428606, 107.330243],
+        [-6.447181, 107.619388],
+        [-6.747017, 108.157822],
+        [-6.884588, 107.496702],
+        [-6.936503, 107.708132],
+        [-6.360361, 107.321840],
+        [-6.327057, 107.171961]
+
+      ];
+      btn.addEventListener('click', () => {
+        // Remove selected class from all buttons
+        document.querySelectorAll('.location-btn').forEach(b => b.classList.remove('selected'));
+        // Add to clicked button
+        btn.classList.add('selected');
+        // Set location
+        setLocation(coords[idx][0], coords[idx][1], 'button');
+      });
+    });
+
+    // Init map
+    const map = L.map('map').setView([lat, lon], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Marker pin inline SVG (tanpa file gambar eksternal, jadi tidak kena blokir CSP / gagal load)
+    const pinIcon = L.divIcon({
+      className: 'pin-marker',
+      html: '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41">' +
+            '<path d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.9 12.5 41 12.5 41S25 21.9 25 12.5C25 5.6 19.4 0 12.5 0Z" fill="#2A81CB" stroke="#1F5F96" stroke-width="1"/>' +
+            '<circle cx="12.5" cy="12.5" r="4.8" fill="#fff"/></svg>',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34]
+    });
+
+    let marker = L.marker([lat, lon], { icon: pinIcon }).addTo(map);
+
+    map.on('click', (e) => {
+      setLocation(e.latlng.lat, e.latlng.lng, 'map');
+    });
+
+    async function loadTodayStatus() {
+      showLoading('Memuat status hari ini...');
+      try {
+        const res = await authFetch('/api/hari-ini');
+        const data = await res.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+          todayStatus = data[0];
+          
+          if (todayStatus.jam_datang) {
+            document.getElementById('jamMasuk').textContent = todayStatus.jam_datang;
+            document.getElementById('subMasuk').textContent = 'Tercatat';
+          }
+          
+          if (todayStatus.jam_pulang) {
+            document.getElementById('jamKeluar').textContent = todayStatus.jam_pulang;
+            document.getElementById('subKeluar').textContent = 'Tercatat';
+          }
+          
+          updateButtonText();
+        }
+      } catch (e) {
+        if (e.name === 'TransientError') {
+          showMessage('Gagal memuat status hari ini', 'error');
+        }
+      } finally {
+        hideLoading();
+      }
+    }
+
+    function updateButtonText() {
+      const btn = document.getElementById('absenBtn');
+      const forceMode = document.getElementById('forceMode').checked;
+      
+      if (!todayStatus.jam_datang) {
+        btn.textContent = 'Check In';
+        btn.disabled = false;
+      } else if (!todayStatus.jam_pulang) {
+        btn.textContent = 'Check Out';
+        btn.disabled = false;
+      } else {
+        if (forceMode) {
+          btn.textContent = 'Force Hit (Lengkap)';
+          btn.disabled = false;
+        } else {
+          btn.textContent = 'Sudah Absen Lengkap';
+          btn.disabled = true;
+        }
+      }
+    }
+    
+    document.getElementById('forceMode').addEventListener('change', updateButtonText);
+    document.getElementById('absenBtn').addEventListener('click', absen);
+
+    async function loadRiwayat() {
+      showLoading('Memuat riwayat absensi...');
+      try {
+        const res = await authFetch('/api/status');
+        const data = await res.json();
+        
+        if (Array.isArray(data) && data.length > 0) {
+          let tableHTML = '<table>';
+          tableHTML += '<thead><tr>';
+          tableHTML += '<th>Tanggal</th>';
+          tableHTML += '<th>Jam Datang</th>';
+          tableHTML += '<th>Jam Pulang</th>';
+          tableHTML += '</tr></thead><tbody>';
+          
+          data.slice(0, 5).forEach(record => {
+            tableHTML += '<tr>';
+            tableHTML += '<td>' + (record.tanggal || '-') + '</td>';
+            tableHTML += '<td>' + (record.jam_datang || '-') + '</td>';
+            tableHTML += '<td>' + (record.jam_pulang || '-') + '</td>';
+            tableHTML += '</tr>';
+          });
+          
+          tableHTML += '</tbody></table>';
+          document.getElementById('riwayatTable').innerHTML = tableHTML;
+        } else {
+          document.getElementById('riwayatTable').innerHTML = '<div style="padding: 12px; background: var(--bg-main); border-radius: 8px; text-align: center; color: var(--text-muted); font-size: 11px;">Belum ada riwayat</div>';
+        }
+      } catch (e) {
+        if (e.name === 'TransientError') {
+          document.getElementById('riwayatTable').innerHTML = '<div style="padding: 12px; background: var(--bg-main); border-radius: 8px; text-align: center; color: var(--text-muted); font-size: 11px;">Gagal memuat riwayat</div>';
+        }
+      } finally {
+        hideLoading();
+      }
+    }
+
+    loadTodayStatus();
+    loadRiwayat();
+
+    // Dump photo checkbox handler
+    const DUMMY_JPEG_BASE64 = "/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAABAAEDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKAP/2Q==";
+    
+    function base64ToBlob(base64) {
+      const binary = atob(base64);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return new Blob([bytes], { type: 'image/jpeg' });
+    }
+
+    document.getElementById('useDumpPhoto').addEventListener('change', (e) => {
+      const fileInputGroup = document.getElementById('fileInputGroup');
+      const preview = document.getElementById('preview');
+      
+      if (e.target.checked) {
+        fileInputGroup.style.display = 'none';
+        preview.style.display = 'none';
+        selectedFile = null;
+      } else {
+        fileInputGroup.style.display = 'block';
+        preview.style.display = 'none';
+      }
+    });
+
+    document.getElementById('foto').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            
+            const maxSize = 800;
+            if (width > height && width > maxSize) {
+              height = (height * maxSize) / width;
+              width = maxSize;
+            } else if (height > maxSize) {
+              width = (width * maxSize) / height;
+              height = maxSize;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            canvas.toBlob((blob) => {
+              selectedFile = new File([blob], file.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+              });
+              console.log('Original:', (file.size / 1024).toFixed(2) + 'KB', '→ Compressed:', (blob.size / 1024).toFixed(2) + 'KB');
+              
+              const preview = document.getElementById('preview');
+              preview.src = canvas.toDataURL('image/jpeg', 0.7);
+              preview.style.display = 'block';
+            }, 'image/jpeg', 0.7);
+          };
+          img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    async function absen() {
+      const forceMode = document.getElementById('forceMode').checked;
+      const useDump = document.getElementById('useDumpPhoto').checked;
+
+      if (!locationSelected) {
+        showDialog('Peringatan', 'Pilih lokasi atau gunakan marker!', false);
+        return;
+      }
+
+      if (!useDump && !selectedFile) {
+        showDialog('Peringatan', 'Foto harus dipilih atau gunakan dump photo', false);
+        return;
+      }
+
+      // ponytail: validate location selection - must explicitly choose location or use map
+
+      const btn = document.getElementById('absenBtn');
+      btn.disabled = true;
+
+      showLoading('Memproses absensi...');
+      
+      try {
+        // ponytail: check if checkout < 8 hours from checkin (even on force mode or completed)
+        let shouldCheckHours = false;
+        
+        if (!forceMode) {
+          // Normal mode: only check when doing checkout
+          if (todayStatus.jam_datang && !todayStatus.jam_pulang) {
+            shouldCheckHours = true;
+          }
+        } else {
+          // Force mode: check if either attempting checkout OR already completed but < 8 hours
+          if (todayStatus.jam_datang) {
+            shouldCheckHours = true;
+          }
+        }
+        
+        if (shouldCheckHours) {
+          // ponytail: use server-side menit_sejak_datang instead of client calculation
+          // More reliable: handles timezone, server time, DST correctly
+          const menitSejakDatang = todayStatus.menit_sejak_datang || 0;
+          const MINIMAL_MENIT = 480; // 8 hours = 480 minutes
+          
+          if (menitSejakDatang < MINIMAL_MENIT) {
+            // ponytail: hide loading before showing confirm dialog
+            hideLoading();
+            
+            // Show warning dialog
+            const action = todayStatus.jam_pulang ? 'Force Hit (sudah Check Out)' : 'Check Out';
+            const jamLalu = (menitSejakDatang / 60).toFixed(1);
+            const menitLalu = menitSejakDatang % 60;
+            const waktuText = menitSejakDatang >= 60 
+              ? `${Math.floor(menitSejakDatang / 60)} jam ${menitLalu} menit` 
+              : `${menitSejakDatang} menit`;
+            
+            const confirmed = await showConfirm(
+              'Belum memasuki waktu Check Out, Lanjutkan?',
+              `Anda baru Check In ${waktuText} yang lalu. Waktu kerja standar adalah 8 jam. Tetap lanjutkan ${action}?`
+            );
+            
+            if (!confirmed) {
+              btn.disabled = false;
+              return;
+            }
+          }
+        }
+
+        // Quick status check only if NOT force mode
+        if (!forceMode) {
+          if (todayStatus.jam_datang && todayStatus.jam_pulang) {
+            hideLoading();
+            showMessage('Sudah absen lengkap hari ini', 'success');
+            btn.disabled = true;
+            return;
+          }
+        }
+
+        const formData = new FormData();
+        if (useDump) {
+          const dumpBlob = base64ToBlob(DUMMY_JPEG_BASE64);
+          const timestamp = Date.now();
+          formData.append('foto', dumpBlob, 'selfie-' + timestamp + '.jpg');
+        } else {
+          formData.append('foto', selectedFile);
+        }
+        formData.append('token', await getValidAccessToken());
+        formData.append('latitude', lat);
+        formData.append('longitude', lon);
+        formData.append('user_id', profile?.id || '');
+        formData.append('username', profile?.username || '');
+        formData.append('nama', profile?.nama_karyawan || '');
+        formData.append('unit', profile?.unit_kerja || '');
+        formData.append('penugasan', profile?.penugasan || '');
+        formData.append('jabatan', profile?.jabatan || '');
+        formData.append('no_hp', profile?.no_hp || '');
+
+        const absenRes = await authFetch('/api/absen', {
+          method: 'POST',
+          body: formData
+        });
+
+        const absenData = await absenRes.json();
+
+        // Show dialog with API response
+        if (absenData.status === 200) {
+          const tag = useDump ? ' (Dump Photo)' : '';
+          const action = !todayStatus.jam_datang ? 'Check In' : 'Check Out';
+          const successMsg = absenData.response?.detail || absenData.response?.keterangan || absenData.response?.message || 'Absen berhasil';
+          
+          hideLoading();
+          showDialog('Sukses', successMsg, true);
+          showMessage('✓ ' + action + ' berhasil!' + tag, 'success');
+          
+          // Reset form state
+          document.getElementById('useDumpPhoto').checked = false;
+          document.getElementById('forceMode').checked = false;
+          document.getElementById('fileInputGroup').style.display = 'block';
+          document.getElementById('foto').value = '';
+          document.getElementById('preview').style.display = 'none';
+          selectedFile = null;
+          
+          // ponytail: reset location selection state
+          locationSelected = false;
+          document.getElementById('map').classList.remove('selected');
+          document.querySelectorAll('.location-btn').forEach(b => b.classList.remove('selected'));
+          
+          await loadTodayStatus();
+          await loadRiwayat();
+
+
+        } else {
+          const tag = useDump ? ' (Dump Photo)' : '';
+          const errorMsg = absenData.response?.detail || absenData.response?.keterangan || absenData.response?.message || 'Absen tidak berhasil';
+          
+          hideLoading();
+          showDialog('Gagal', errorMsg, false);
+          
+          // ponytail: show additional help message for 400 status (schedule not found)
+          if (absenData.status === 400) {
+            const catatanJadwal =
+            'Absen gagal karena jadwal tidak ditemukan. Pastikan Anda memiliki jadwal kerja hari ini dan coba lagi.';
+            showMessage('✗ ' + errorMsg + tag, 'error');
+            showMessage(catatanJadwal, 'error');
+          } else {
+            showMessage('✗ ' + errorMsg + tag, 'error');
+          }
+          
+          // ponytail: reset form state even on failure
+          document.getElementById('useDumpPhoto').checked = false;
+          document.getElementById('forceMode').checked = false;
+          document.getElementById('fileInputGroup').style.display = 'block';
+          document.getElementById('foto').value = '';
+          document.getElementById('preview').style.display = 'none';
+          selectedFile = null;
+          
+          // ponytail: reset location selection state on failure too
+          locationSelected = false;
+          document.getElementById('map').classList.remove('selected');
+          document.querySelectorAll('.location-btn').forEach(b => b.classList.remove('selected'));
+          
+          // ponytail: re-enable button and update text based on current status
+          btn.disabled = false;
+          updateButtonText();
+        }
+
+        
+      } catch (e) {
+        hideLoading();
+        showMessage(
+          e.name === 'TransientError' ? 'Koneksi bermasalah, coba lagi' : 'Error: ' + e.message,
+          'error'
+        );
+        btn.disabled = false;
+      }
+    }
+
+    function showMessage(text, type) {
+      const msg = document.getElementById('message');
+      // ponytail: innerHTML safe here - text from client actions, templates are static
+      if (type === 'error') {
+        msg.innerHTML = '<div class="alert-err"><div class="alert-err-text">' + text + '</div></div>';
+      } else {
+        msg.innerHTML = '<div class="success-msg">' + text + '</div>';
+      }
+    }
+
+    function showDialog(title, content, isSuccess) {
+      const overlay = document.getElementById('dialogOverlay');
+      const header = document.getElementById('dialogHeader');
+      const contentEl = document.getElementById('dialogContent');
+      
+      header.textContent = title;
+      header.className = 'dialog-header ' + (isSuccess ? 'success' : 'error');
+      contentEl.textContent = content;
+      
+      overlay.classList.add('show');
+    }
+
+    function closeDialog() {
+      document.getElementById('dialogOverlay').classList.remove('show');
+    }
+
+    // ponytail: loading overlay helpers
+    function showLoading(text = 'Memuat...') {
+      const overlay = document.getElementById('loadingOverlay');
+      const textEl = document.getElementById('loadingText');
+      textEl.textContent = text;
+      overlay.classList.add('show');
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.remove('show');
+    }
+
+    // ponytail: show confirm dialog, returns Promise<boolean>
+    function showConfirm(title, content) {
+      return new Promise((resolve) => {
+        const overlay = document.getElementById('confirmOverlay');
+        const contentEl = document.getElementById('confirmContent');
+        
+        contentEl.textContent = content;
+        overlay.classList.add('show');
+        
+        const handleYes = () => {
+          overlay.classList.remove('show');
+          cleanup();
+          showLoading('Memproses absensi...');  // ponytail: show loading after user confirms
+          resolve(true);
+        };
+        
+        const handleNo = () => {
+          overlay.classList.remove('show');
+          cleanup();
+          resolve(false);
+        };
+        
+        const handleClickOutside = (e) => {
+          if (e.target.id === 'confirmOverlay') {
+            overlay.classList.remove('show');
+            cleanup();
+            resolve(false);
+          }
+        };
+        
+        const cleanup = () => {
+          document.getElementById('confirmYesBtn').removeEventListener('click', handleYes);
+          document.getElementById('confirmNoBtn').removeEventListener('click', handleNo);
+          overlay.removeEventListener('click', handleClickOutside);
+        };
+        
+        document.getElementById('confirmYesBtn').addEventListener('click', handleYes);
+        document.getElementById('confirmNoBtn').addEventListener('click', handleNo);
+        overlay.addEventListener('click', handleClickOutside);
+      });
+    }
+
+    // Dialog close handlers
+    document.getElementById('dialogCloseBtn').addEventListener('click', closeDialog);
+    document.getElementById('dialogOverlay').addEventListener('click', (e) => {
+      if (e.target.id === 'dialogOverlay') closeDialog();
+    });
+    })(); // Close IIFE
+  </script>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <a href="/jadwal.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+        <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
+        <path d="M9 9l1 0"></path>
+        <path d="M9 13l6 0"></path>
+        <path d="M9 17l6 0"></path>
+      </svg>
+      <span class="nav-label">Jadwal</span>
+    </a>
+    <a href="/absen.html" class="nav-item active">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 7v-1a2 2 0 0 1 2 -2h2"></path>
+        <path d="M4 17v1a2 2 0 0 0 2 2h2"></path>
+        <path d="M16 4h2a2 2 0 0 1 2 2v1"></path>
+        <path d="M16 20h2a2 2 0 0 0 2 -2v-1"></path>
+        <path d="M5 12l14 0"></path>
+      </svg>
+      <span class="nav-label">Absen</span>
+    </a>
+    <a href="/riwayat.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 8l0 4l2 2"></path>
+        <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"></path>
+      </svg>
+      <span class="nav-label">Riwayat</span>
+    </a>
+  </nav>
+</body>
+</html>

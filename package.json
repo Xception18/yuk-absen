@@ -1,0 +1,14 @@
+{
+  "name": "yuk-absen",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Yuk Absen - proxy absensi Naradaya (porting dari Cloudflare Workers ke Vercel)",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  }
+}

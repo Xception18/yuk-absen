@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#B71C1C">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Yuk Absen</title>
+  <style>
+    :root {
+      --red-primary: #c8323c;
+      --red-dark: #7b0e16;
+      --bg-main: #f5f6f8;
+      --bg-surface: #fff;
+      --border-subtle: #e4e6eb;
+      --border-strong: #d7dae0;
+      --text-main: #14161a;
+      --text-secondary: #5f6470;
+      --text-muted: #8a8e99;
+      --icon-muted: #a7abb5;
+      --grad-header: linear-gradient(165deg, var(--red-primary) 0%, var(--red-dark) 100%);
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: var(--font);
+      background: var(--bg-main);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .lg-wrap {
+      background: var(--bg-main);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      padding: 18px 16px;
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .lg-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+    .lg-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lg-bar {
+      background: var(--red-primary);
+      border-radius: 2px;
+      width: 5px;
+      height: 34px;
+    }
+    .lg-wtxt {
+      color: var(--text-main);
+      letter-spacing: 0.5px;
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    .lg-wsub {
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      font-size: 9px;
+      text-transform: uppercase;
+    }
+    .lg-fg {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .lg-fl {
+      color: var(--text-secondary);
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .lg-input {
+      background: var(--bg-surface);
+      border: 0.5px solid var(--border-strong);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 10px;
+    }
+    .lg-input.err {
+      background: #fbede9;
+      border-color: #d85a30;
+    }
+    .lg-input input {
+      color: var(--text-main);
+      background: transparent;
+      border: none;
+      outline: none;
+      flex: 1;
+      font-family: inherit;
+      font-size: 12px;
+    }
+    .lg-input input::placeholder {
+      color: var(--icon-muted);
+    }
+    .lg-btn {
+      background: var(--red-primary);
+      color: #fff;
+      cursor: pointer;
+      border: none;
+      border-radius: 9px;
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+    }
+    .lg-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .alert-err {
+      background: #fbeaea;
+      border: 0.5px solid #f0c2c2;
+      border-radius: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+    .alert-err-text {
+      color: #8a1f26;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+    .alert-err-text b {
+      display: block;
+      margin-bottom: 2px;
+      font-size: 11px;
+    }
+    .success-msg {
+      background: #e5f3ea;
+      border: 0.5px solid #b8dec8;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      color: #1f6b3c;
+      font-size: 10px;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+    .lg-foot {
+      text-align: center;
+      color: var(--icon-muted);
+      margin-top: 6px;
+      font-size: 9px;
+    }
+    .lg-foot a {
+      color: var(--red-primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    /* Loading spinner */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .loading-overlay.show {
+      display: flex;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .loading-text {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="lg-wrap">
+    <div class="lg-logo">
+      <div class="lg-brand">
+        <div class="lg-bar"></div>
+        <div class="lg-wtxt">YUK ABSEN</div>
+      </div>
+    </div>
+    
+    <div class="lg-fg">
+      <label class="lg-fl">ID KARYAWAN</label>
+      <div class="lg-input">
+        <input type="text" id="username" placeholder="Masukkan ID karyawan">
+      </div>
+    </div>
+
+    <div class="lg-fg">
+      <label class="lg-fl">PASSWORD</label>
+      <div class="lg-input">
+        <input type="password" id="password" placeholder="Masukkan password">
+      </div>
+    </div>
+
+    <button class="lg-btn" id="loginBtn">Masuk</button>
+    <div id="message"></div>
+    
+    <!-- <div class="lg-foot">
+      Made by <a href="https://t.me/sffrmnsyh" target="_blank">@sffrmnsyh</a>
+    </div> -->
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Memuat...</div>
+  </div>
+
+  <script type="module">
+    import { startSession, login } from "/auth.js";
+
+    // Loading helpers
+    function showLoading(text = 'Memuat...') {
+      const overlay = document.getElementById('loadingOverlay');
+      const textEl = document.getElementById('loadingText');
+      textEl.textContent = text;
+      overlay.classList.add('show');
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.remove('show');
+    }
+
+    // Check existing session
+    showLoading('Memeriksa sesi...');
+    if (await startSession()) {
+      location.href = "/absen";
+    } else {
+      hideLoading();
+    }
+
+    const savedUser = localStorage.getItem('saved_user');
+    if (savedUser) document.getElementById('username').value = savedUser;
+
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value;
+
+      if (!user || !pass) {
+        showMessage('ID karyawan dan password harus diisi', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('loginBtn');
+      btn.disabled = true;
+      btn.textContent = 'Memproses...';
+
+      showLoading('Login...');
+
+      try {
+        const profile = await login(user, pass);
+        localStorage.setItem('saved_user', user);
+        hideLoading();
+        showMessage('Login berhasil!', 'success');
+        setTimeout(() => location.href = '/absen', 300);
+      } catch (e) {
+        hideLoading();
+        showMessage(
+          e.name === 'AuthError' ? (e.message || 'ID atau password salah') : 'Koneksi bermasalah, coba lagi',
+          'error'
+        );
+        btn.disabled = false;
+        btn.textContent = 'Masuk';
+      }
+    });
+
+    function showMessage(text, type) {
+      const msg = document.getElementById('message');
+      if (type === 'error') {
+        msg.innerHTML = '<div class="alert-err"><div class="alert-err-text"><b>Login Gagal</b>' + text + '</div></div>';
+      } else {
+        msg.innerHTML = '<div class="success-msg">' + text + '</div>';
+      }
+    }
+
+    document.getElementById('password').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') document.getElementById('loginBtn').click();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sedang Maintenance - Absensi</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .maintenance-card {
+      background: white;
+      border-radius: 16px;
+      padding: 48px 32px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 24px;
+      background: #fef3c7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+    
+    h1 {
+      margin: 0 0 16px;
+      font-size: 28px;
+      color: #1f2937;
+      font-weight: 600;
+    }
+    
+    p {
+      color: #6b7280;
+      line-height: 1.6;
+      margin: 0 0 24px;
+      font-size: 15px;
+    }
+    
+    .eta {
+      background: #f3f4f6;
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #374151;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .eta strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #1f2937;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .eta-time {
+      font-size: 20px;
+      color: #667eea;
+      font-weight: 600;
+    }
+    
+    @media (max-width: 480px) {
+      .maintenance-card {
+        padding: 36px 24px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .icon {
+        width: 64px;
+        height: 64px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="maintenance-card">
+    <div class="icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
+      </svg>
+    </div>
+    
+    <h1>Sedang Maintenance</h1>
+    
+    <p>Sistem absensi sedang dalam perbaikan untuk meningkatkan kualitas layanan. Mohon coba kembali beberapa saat lagi.</p>
+    
+    <div class="eta">
+      <strong>Estimasi Selesai</strong>
+      <div class="eta-time" id="eta">Segera</div>
+    </div>
+  </div>
+  
+  <script>
+    // Display ETA from query parameter
+    const params = new URLSearchParams(location.search);
+    const eta = params.get('eta');
+    if (eta) {
+      document.getElementById('eta').textContent = eta;
+    }
+  </script>
+</body>
+</html>

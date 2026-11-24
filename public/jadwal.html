@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#B71C1C">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Jadwal Absen</title>
+  <style>
+    :root {
+      --red-primary: #c8323c;
+      --red-dark: #7b0e16;
+      --bg-main: #f5f6f8;
+      --bg-surface: #fff;
+      --border-subtle: #e4e6eb;
+      --text-main: #14161a;
+      --text-secondary: #5f6470;
+      --text-muted: #8a8e99;
+      --icon-muted: #a7abb5;
+      --grad-header: linear-gradient(165deg, var(--red-primary) 0%, var(--red-dark) 100%);
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { 
+      font-family: var(--font);
+      background: var(--bg-main);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 70px;
+    }
+    .shell {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+    }
+    .hdr {
+      background: var(--grad-header);
+      padding: 14px 16px 20px;
+    }
+    .htop {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lbar {
+      width: 3px;
+      height: 28px;
+      background: white;
+      border-radius: 2px;
+    }
+    .ltxt {
+      color: white;
+      font-weight: 700;
+      font-size: 15px;
+      line-height: 1;
+    }
+    .lsub {
+      color: rgba(255,255,255,0.7);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .uname {
+      color: #fff;
+      font-weight: 600;
+      font-size: 16px;
+      margin-top: 8px;
+    }
+    .dloc {
+      color: rgba(255, 255, 255, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+      font-size: 11px;
+    }
+    .body {
+      padding: 16px;
+    }
+    .coming-soon {
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .coming-soon svg {
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+    .coming-soon h2 {
+      font-size: 18px;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+    .coming-soon p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      z-index: 1000;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 6px;
+      text-decoration: none;
+      color: var(--icon-muted);
+      transition: color 0.2s;
+    }
+    .nav-item.active {
+      color: var(--red-primary);
+    }
+    .nav-item svg {
+      width: 24px;
+      height: 24px;
+    }
+    .nav-label {
+      font-size: 10px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="hdr">
+      <div class="htop">
+        <div class="logo">
+          <div class="lbar"></div>
+          <div>
+            <div class="ltxt">ADHIMIX</div>
+            <div class="lsub">GROUP</div>
+          </div>
+        </div>
+      </div>
+      <div class="uname">Jadwal Absen</div>
+      <div class="dloc">
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path><path d="M16 3v4"></path><path d="M8 3v4"></path><path d="M4 11h16"></path></svg>
+        Jadwal kerja Anda
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="coming-soon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"></path>
+          <path d="M16 3v4"></path>
+          <path d="M8 3v4"></path>
+          <path d="M4 11h16"></path>
+          <path d="M11 15h1"></path>
+          <path d="M12 15v3"></path>
+        </svg>
+        <h2>Segera Hadir</h2>
+        <p>Fitur jadwal absen sedang dalam pengembangan</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <a href="/jadwal.html" class="nav-item active">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 3v4a1 1 0 0 0 1 1h4"></path>
+        <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"></path>
+        <path d="M9 9l1 0"></path>
+        <path d="M9 13l6 0"></path>
+        <path d="M9 17l6 0"></path>
+      </svg>
+      <span class="nav-label">Jadwal</span>
+    </a>
+    <a href="/absen.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 7v-1a2 2 0 0 1 2 -2h2"></path>
+        <path d="M4 17v1a2 2 0 0 0 2 2h2"></path>
+        <path d="M16 4h2a2 2 0 0 1 2 2v1"></path>
+        <path d="M16 20h2a2 2 0 0 0 2 -2v-1"></path>
+        <path d="M5 12l14 0"></path>
+      </svg>
+      <span class="nav-label">Absen</span>
+    </a>
+    <a href="/riwayat.html" class="nav-item">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 8l0 4l2 2"></path>
+        <path d="M3.05 11a9 9 0 1 1 .5 4m-.5 5v-5h5"></path>
+      </svg>
+      <span class="nav-label">Riwayat</span>
+    </a>
+  </nav>
+
+  <script type="module">
+    import { startSession, onSessionEnd } from "/auth.js";
+    
+    onSessionEnd(() => { location.href = "/"; });
+    if (!(await startSession())) location.href = "/";
+  </script>
+</body>
+</html>
